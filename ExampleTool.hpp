@@ -51,19 +51,19 @@ public:
         ToolBase::setBackend(newBackend);
 
         newBackend.bind("<EDITION>", [this]() {
-                std::string temp = getEntry("KEY");
+            std::string temp = getEntry("KEY");
 
-                if (temp == "<DEL>")
-                {
+            if (temp == "<DEL>")
+            {
                 if (!text.empty())
-                text.pop_back();
-                }
-                else
+                    text.pop_back();
+            }
+            else
                 text.insert(text.end(), temp.begin(), temp.end());
 
-                printText();
-                },
-                "");
+            printText();
+        },
+                        "");
     }
 
 private:
