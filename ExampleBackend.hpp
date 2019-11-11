@@ -120,6 +120,7 @@ private:
         }
         statusWindow = newwin(2, COLS, LINES-2, 0);
         statusPanel = new_panel(statusWindow);
+        bottom_panel(statusPanel);
 
         wmove(statusWindow, 0, 0);
         whline(statusWindow, 0, COLS);
