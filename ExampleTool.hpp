@@ -3,6 +3,7 @@
 
 #include <map>
 #include <ncurses.h>
+#include <panel.h>
 #include "ToolBase.hpp"
 #include "BackendBase.hpp"
 
@@ -13,16 +14,16 @@ class ExampleTool : public ToolBase
 public:
     ExampleTool()
     {
-        window = newwin(LINES - 2, COLS, 1, 0);
-        box(window, 0, 0);
-        wrefresh(window);
-        move(LINES - 1, 0);
+        // this example just doesn't allow to quit
+        setEntry("IS_SAVED", "NO");
     }
     ~ExampleTool()
     {
-        wborder(window, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
-        wrefresh(window);
-        delwin(window);
+        if (window != nullptr)
+        {
+            del_panel(panel);
+            delwin(window);
+        }
     }
     void setEntry(const std::string &key, const std::string &value) noexcept override
     {
@@ -32,53 +33,50 @@ public:
     {
         return entries[key];
     }
+    void setCoordinates(int width, int height, int startx, int starty) noexcept override
+    {
+        if (window != nullptr)
+        {
+            del_panel(panel);
+            delwin(window);
+        }
+
+        window = newwin(width, height, startx, starty);
+        panel = new_panel(window);
+
+        printText();
+    }
     void setBackend(backends::BackendBase &newBackend) override
     {
         ToolBase::setBackend(newBackend);
 
-        setEntry("EXIT", "false");
-
         newBackend.bind("<EDITION>", [this]() {
-            std::string temp = getEntry("KEY");
+                std::string temp = getEntry("KEY");
 
-            if (temp == "<DEL>")
-            {
-                if (text.size())
+                if (temp == "<DEL>")
                 {
-                    text.erase(text.end() - 1);
+                if (!text.empty())
+                text.pop_back();
                 }
-                temp = text;
-            }
-            else
-            {
+                else
                 text.insert(text.end(), temp.begin(), temp.end());
-                temp = text;
-            }
 
-            std::size_t pos = 0;
-            while ((pos = temp.find("\n", pos)) != std::string::npos)
-            {
-                temp.replace(pos, 1, "\n ");
-                pos += 2;
-            }
-
-            werase(window);
-            mvwprintw(window, 1, 1, temp.c_str());
-            box(window, 0, 0);
-            wrefresh(window);
-        },
-                        "");
-
-        newBackend.bind("exit", [this]() {
-            setEntry("EXIT", "true");
-        },
-                        "");
+                printText();
+                },
+                "");
     }
 
 private:
     std::map<std::string, std::string> entries;
-    WINDOW *window;
+    WINDOW *window = nullptr;
+    PANEL *panel = nullptr;
     std::string text;
+
+    void printText()
+    {
+        werase(window);
+        mvwprintw(window, 0, 0, text.c_str());
+    }
 };
 } // namespace tools
 #endif /* !EXAMPLETOOL_H_ */

@@ -7,21 +7,9 @@
 
 int main(int argc, char *argv[])
 {
-
-    initscr();
-    cbreak();
-    keypad(stdscr, true);
-    noecho();
-    refresh();
-
-    {
-        tools::ExampleTool tool;
-        backends::ExampleBackend backend;
-        backend.setTool(tool);
-        tool.setBackend(backend);
-        backend();
-    }
-
-    endwin();
-    return 0;
+    tools::ExampleTool tool;
+    backends::ExampleBackend backend;
+    backend.setTool(tool);
+    tool.setBackend(backend);
+    backend();
 }

@@ -17,6 +17,8 @@ public:
     virtual std::string getEntry(const std::string &key) noexcept = 0;
     virtual void setBackend(backends::BackendBase &newBackend) { backend = &newBackend; }
 
+    virtual void setCoordinates(int width, int height, int startx, int starty) noexcept = 0;
+
 protected:
     backends::BackendBase *backend = nullptr;
 };
