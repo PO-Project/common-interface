@@ -20,7 +20,7 @@ public:
         keypad(stdscr, true);
         noecho();
 
-        ESCDELAY = 25;
+        set_escdealy(25);
 
         bind("quit", [this](){ tryToQuit = true; }, "help we ignore in example");
         bind("donothing", [this](){}, "nothing");
