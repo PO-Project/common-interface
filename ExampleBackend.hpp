@@ -3,7 +3,7 @@
 
 #include <map>
 #include <ncurses.h>
-#include <panel.h>
+#include <ncurses/panel.h>
 #include "BackendBase.hpp"
 #include "ToolBase.hpp"
 
