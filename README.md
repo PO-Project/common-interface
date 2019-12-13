@@ -15,6 +15,7 @@ Wystarczy wrzucić pliki `BackendBase.hpp` i `ToolBase.hpp` do głównego katalo
 Przykład online: [gitpod.io#https://github.com/PO-Project/common-interface](https://www.gitpod.io#https://github.com/PO-Project/common-interface)
 
 Kompilacja przykładu: `g++ main.cpp -o example -lncurses -lpanel`
+
 Na komputerach politechnicznych sugeruję: `g++ main.cpp -o example -lncurses -lpanel -I /usr/include/ncurses`
 
 ## ncurses
