@@ -123,7 +123,7 @@ private:
         bottom_panel(statusPanel);
 
         wmove(statusWindow, 0, 0);
-        whline(statusWindow, 0, COLS);
+        whline(statusWindow, '-', COLS);
         displayStatus();
 
         // tell tool to resize it's windows
