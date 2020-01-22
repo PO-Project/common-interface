@@ -59,8 +59,14 @@ public:
                     text.pop_back();
             }
             else
-                text.insert(text.end(), temp.begin(), temp.end());
+                text += temp;
 
+            printText();
+        },
+                        "");
+
+        newBackend.bind("clear", [this]() {
+            text.clear();
             printText();
         },
                         "");
