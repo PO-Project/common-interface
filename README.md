@@ -12,6 +12,8 @@ Wystarczy wrzucić pliki `BackendBase.hpp` i `ToolBase.hpp` do głównego katalo
 
 #### `ExampleFrontend.hpp`
 
+Przykład jest namiastką vima, która obsługuje jedynie pisanie i wymazywanie tekstu na ekranie oraz dostarcza podstawową obsługę komend (nie pełną względem specyfikacji dotyczącej vima, nie jest obsługiwe np. _#vim..._ czy _... ${ARGUMENT} ..._).
+
 Przykład online: [gitpod.io#https://github.com/PO-Project/common-interface](https://www.gitpod.io#https://github.com/PO-Project/common-interface)
 
 Kompilacja przykładu: `g++ main.cpp -o example -lncurses -lpanel`
@@ -30,10 +32,9 @@ Proponuję używać ncurses z panelami:
   * Jeśli backend dodaje nowe panele albo chce zmienić kolejność paneli na stosie (np. żeby kursor był w dobrym miejscu przy wpisywaniu komendy w vimie, albo by wyświetlić menu mcedita które może zasłaniać to co rysuje tool podczas wybierania opcji) to zawsze przed wywołaniem następnej funkcji zbindowanej przez toola przenosi swoje panele na spód stosu, nie zmienia kolejności paneli toola
   * Backend wywołuje update\_panels() i doupdate() po każdym wywołaniu zbindowanych funkcji, przed oczekiwaniem na input
 
-// Chyba że napiszemy jakiś ładny, wspólny, obiektowy wrapper do ncurses
 
 ## Współpraca
 
-Jestem otwarty na dyskusję o zmianach.
+Jesteśmy otwarci na dyskusję o zmianach i chętni do udzielenia pomocy związan z tą specyfikacją
 
 
