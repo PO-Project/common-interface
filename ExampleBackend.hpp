@@ -7,6 +7,8 @@
 #include "BackendBase.hpp"
 #include "ToolBase.hpp"
 
+
+// namespace to made the code prettier (and prevent conflicts) 
 namespace backends
 {
 class ExampleBackend : public BackendBase
@@ -20,37 +22,41 @@ public:
         keypad(stdscr, true);
         noecho();
 
-        ESCDELAY = 25;
+        set_escdelay(25);
 
+        // bind its own commands (you can bind some kind of "help" command here)
+        // note: capturing this to lambda is good trick
+        // https://en.cppreference.com/w/cpp/language/lambda
         bind("quit", [this](){ tryToQuit = true; }, "help we ignore in example");
         bind("donothing", [this](){}, "nothing");
     }
     ~ExampleBackend()
     {
-        // end curses session
+        // end ncurses session
         endwin();
     }
 
     void bind(const std::string &command, std::function<void()> callback, const std::string &helpMessage) noexcept override
     {
-        // This example ignores helpMessage
+        // this example ignores helpMessage
+        // you mustn't ignores it
         callbacks[command] = callback;
     }
     void operator()() override
     {
         // read input and run binds in a loop
-
         int inputCharacter;
         while (true)
         {
             // if terminal was resized resize windows
             if (LINES != oldLINES || COLS != oldCOLS)
             {
-                ResizeWindow();
+                resizeWindow();
                 oldLINES = LINES;
                 oldCOLS = COLS;
             }
-
+            
+            // redraw (update) window
             update_panels();
             doupdate();
 
@@ -63,12 +69,14 @@ public:
                 wmove(statusWindow, 1, 0);
                 wclrtoeol(statusWindow);
                 std::string command(256, '\0');
+                // read command
                 wscanw(statusWindow, "%s", command.data());
                 command.erase(command.find('\0'));
                 noecho();
                 // move panel back to bottom
                 bottom_panel(statusPanel);
 
+                // if command for callback exists call it
                 if (callbacks.count(command))
                     callbacks[command]();
                 else
@@ -76,17 +84,35 @@ public:
             }
             else
             {
+                // handle special characters
                 if (inputCharacter != KEY_BACKSPACE)
                     tool->setEntry("KEY", std::string(1, inputCharacter));
                 else
                     tool->setEntry("KEY", "<DEL>");
 
+                // currently proposed special key bindings are:
+                /*
+                27              "<ESC>"
+                KEY_ENTER       "<ENTER>"
+                KEY_BACKSPACE   "<DEL>"
+                KEY_UP          "<UARROW>"
+                KEY_DOWN        "<DARROW>"
+                KEY_LEFT        "<LARROW>"
+                KEY_RIGHT       "<RARROW>"
+                */
+
+                // call "<EDITION>" callback to inform the tool
+                // about keypress event
                 if (callbacks.count("<EDITION>"))
                     callbacks["<EDITION>"]();
             }
 
+            // tryToQuit is modified in line 28 in "quit" callback
             if (tryToQuit)
             {
+                // if project isn't save you mustn't exit
+                // (actually, this example won't save anything
+                // so you cannot exit this example in this way)
                 if (tool->getEntry("IS_SAVED") == "NO")
                 {
                     setStatus("Can't quit, file not saved!");
@@ -100,19 +126,28 @@ public:
 
 private:
 
+    // dictionary maping from string to function
+    // general concept:
+    // https://en.wikipedia.org/wiki/Associative_array
+    // cpp implementaion:
+    // https://en.cppreference.com/w/cpp/container/map
     std::map<std::string, std::function<void()>> callbacks;
 
+    // ncurses window and panel
     WINDOW *statusWindow = nullptr;
     PANEL *statusPanel = nullptr;
 
+    // message displaying below window
     std::string status;
 
+    // old size of window
     int oldLINES = -1, oldCOLS = -1;
 
     bool tryToQuit = false;
 
-    void ResizeWindow()
-    {
+    void resizeWindow()
+    {   
+        // recreate window with appropria size
         if (statusPanel != nullptr)
         {
             del_panel(statusPanel);
@@ -122,11 +157,12 @@ private:
         statusPanel = new_panel(statusWindow);
         bottom_panel(statusPanel);
 
+        // redraw status line
         wmove(statusWindow, 0, 0);
-        whline(statusWindow, 0, COLS);
+        whline(statusWindow, '-', COLS);
         displayStatus();
 
-        // tell tool to resize it's windows
+        // tell tool to resize its windows
         tool->setCoordinates(LINES-2, COLS, 0, 0);
     }
     void setStatus(const std::string &s)
