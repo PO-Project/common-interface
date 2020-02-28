@@ -125,6 +125,12 @@ public:
     }
 
 private:
+
+    // dictionary maping from string to function
+    // general concept:
+    // https://en.wikipedia.org/wiki/Associative_array
+    // cpp implementaion:
+    // https://en.cppreference.com/w/cpp/container/map
     std::map<std::string, std::function<void()>> callbacks;
 
     // ncurses window and panel
